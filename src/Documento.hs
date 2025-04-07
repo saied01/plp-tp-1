@@ -48,9 +48,8 @@ d1 <+> d2 = foldDoc d2 textoRec Linea d1
                 _          -> texto s <+> x
 
 
-
-indentar :: Int -> Doc -> Doc
-indentar i = error "PENDIENTE: Ejercicio 3"
+indentar :: Int -> Doc -> Doc 
+indentar i = foldDoc (Vacio) (\s dacc -> Texto s (Linea i dacc)) (\i2 dacc -> Linea i (Linea (i+i2) dacc))
 
 mostrar :: Doc -> String
 mostrar = foldDoc ("") (\s dacc -> s ++ dacc) (\i dacc -> "\n" ++ (replicate i ' ') ++ dacc)
