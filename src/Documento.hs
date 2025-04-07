@@ -10,6 +10,7 @@ module Documento
     imprimir,
   )
 where
+--import Distribution.Compat.Lens (_1)
 
 data Doc
   = Vacio
@@ -41,16 +42,19 @@ foldDoc fv ft fl doc = case doc of
 infixr 6 <+>
 
 (<+>) :: Doc -> Doc -> Doc
-d1 <+> d2 = foldDoc d2 textoRec Linea d1
-  where textoRec s x = case x of
-                Vacio      -> texto s
-                Texto s2 d -> texto (s++s2) <+> d
-                _          -> texto s <+> x
-
+d1 <+> d2 = foldDoc d2 textoRec lineaRec d1
+  where
+    textoRec s x = case x of
+      Texto s2 d  -> Texto (s ++ s2) d
+      _           -> Texto s x
+    lineaRec = Linea
 
 
 indentar :: Int -> Doc -> Doc
-indentar i = error "PENDIENTE: Ejercicio 3"
+indentar i d = foldDoc Vacio textoIgual agregarInd d
+  where
+    agregarInd int doc = Linea (int+i) doc 
+    textoIgual str doc = Texto str doc
 
 mostrar :: Doc -> String
 mostrar = foldDoc ("") (\s dacc -> s ++ dacc) (\i dacc -> "\n" ++ (replicate i ' ') ++ dacc)
@@ -61,6 +65,6 @@ mostrar = foldDoc ("") (\s dacc -> s ++ dacc) (\i dacc -> "\n" ++ (replicate i '
 -- abc
 --   def
 
+
 imprimir :: Doc -> IO ()
 imprimir d = putStrLn (mostrar d)
-
