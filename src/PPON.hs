@@ -1,6 +1,7 @@
 module PPON where
 
 import Documento
+import GHC.IO.Encoding (TextEncoding(textEncodingName))
 
 data PPON
   = TextoPP String
@@ -41,9 +42,15 @@ entreLlaves ds =
 aplanar :: Doc -> Doc
 aplanar doc = intercalar (texto " ") (foldDoc [] textoRec lineaRec doc)
   where
-    textoRec str listaDoc = [texto str] ++ listaDoc
-    lineaRec _ listaDoc   = [] ++ listaDoc
-
+    textoRec str listaDoc = texto str :listaDoc
+    lineaRec _ listaDoc   = listaDoc
 
 pponADoc :: PPON -> Doc
-pponADoc = error "PENDIENTE: Ejercicio 9"
+pponADoc ppon = case ppon of
+  TextoPP s -> texto (['"'] ++ s ++ ['"'])
+  IntPP i -> texto (show i)
+  ObjetoPP o -> if pponObjetoSimple (ObjetoPP o) then entreLlavesSinSaltos (map formatoPPON o) else entreLlaves (map formatoPPON o)
+    where formatoPPON (s,pp) = texto (show s ++ ": ") <+> pponADoc pp
+
+entreLlavesSinSaltos :: [Doc] -> Doc
+entreLlavesSinSaltos ds = texto "{ " <+> intercalar (texto ", ") ds <+> texto " }"
