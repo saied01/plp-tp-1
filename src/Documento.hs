@@ -41,13 +41,18 @@ foldDoc fv ft fl doc = case doc of
 infixr 6 <+>
 
 (<+>) :: Doc -> Doc -> Doc
-d1 <+> d2 = error "PENDIENTE: Ejercicio 2"
+d1 <+> d2 = foldDoc d2 textoRec Linea d1
+  where textoRec s x = case x of
+                Vacio      -> texto s
+                Texto s2 d -> texto (s++s2) <+> d
+                _          -> texto s <+> x
 
-indentar :: Int -> Doc -> Doc
-indentar i = error "PENDIENTE: Ejercicio 3"
+
+indentar :: Int -> Doc -> Doc 
+indentar i = foldDoc (Vacio) (\s dacc -> Texto s (Linea i dacc)) (\i2 dacc -> Linea i (Linea (i+i2) dacc))
 
 mostrar :: Doc -> String
-mostrar = error "PENDIENTE: Ejercicio 4"
+mostrar = foldDoc ("") (\s dacc -> s ++ dacc) (\i dacc -> "\n" ++ (replicate i ' ') ++ dacc)
 
 -- | Función dada que imprime un documento en pantalla
 
@@ -57,3 +62,4 @@ mostrar = error "PENDIENTE: Ejercicio 4"
 
 imprimir :: Doc -> IO ()
 imprimir d = putStrLn (mostrar d)
+
