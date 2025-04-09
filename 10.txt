@@ -27,45 +27,45 @@ Demostración:
 CASO BASE:
 
 -- Lado izquierdo 
-indentar n (indentar m Vacio) = {Lema 1}
-indentar n Vacio = {Lema 1}
-Vacio
+indentar n (indentar m Vacio)
+= indentar n Vacio                <- {Lema 1}
+= Vacio                           <- {Lema 1}
 
 -- Lado derecho
-indentar (n + m) Vacio = {beta}
-Vacio
+indentar (n + m) Vacio
+= Vacio                           <- {Lema 1}
 
-PASO INDUCTIVO:
+CASOS INDUCTIVOS:
 HI: indentar n (indentar m d) = indentar (n + m) d
 
-CASO 1:
+CASO 1 (Texto String Doc):
 Para todo s :: String y d :: Doc
 
 QVQ: indentar n (indentar m (Texto s d)) = indentar (n + m) (Texto s d)
 
 -- Lado izquierdo
-indentar n (indentar m (Texto s d)) = {Lema 2}
-indentar n (Texto s (indentar m d)) = {Lema 2}
-Texto s (indentar n (indentar m d))          -- definición de indentar
-Texto s (indentar (n + m) d)                 -- por HI
+indentar n (indentar m (Texto s d))
+= indentar n (Texto s (indentar m d))     <- {Lema 2}
+= Texto s (indentar n (indentar m d))     <- {Lema 2}
+= Texto s (indentar (n + m) d)            <- {HI}
 
 -- Lado derecho
-indentar (n + m) (Texto s d) = {Lema 2}
-Texto s (indentar (n + m) d)
+indentar (n + m) (Texto s d)
+Texto s (indentar (n + m) d)     <- {Lema 2}
 
 Llegamos a que ambos lados son iguales.
 
-CASO 2:
+CASO 2 (Linea Int Doc):
 
 Para todo k :: Int positivo y d :: Doc
 
 QVQ: indentar n (indentar m (Linea k d)) = indentar (n + m) (Linea k d)
 
 -- Lado izquierdo 
-indentar n (indentar m (Linea k d)) = {Lema 3}
-indentar n (Linea (k + m) (indentar m d)) = {Lema 3} 
-Linea (k + m + n) (indentar n (indentar m d)) = {HI} 
-Linea (k + m + n) (indentar (n + m) d)
+indentar n (indentar m (Linea k d))
+= indentar n (Linea (k + m) (indentar m d))      <- {Lema 3} 
+= Linea (k + m + n) (indentar n (indentar m d))  <- {Lema 3} 
+= Linea (k + m + n) (indentar (n + m) d)         <- {HI}
 
 -- Lado derecho
 indentar (n + m) (Linea k d) = {Lema 3}
@@ -88,33 +88,35 @@ Demostración de Lemas:
 
 1. indentar k Vacio = Vacio
 
-   indentar k Vacio = {ID}
-   foldDoc Vacio (Texto str doc) (Linea (int + k) doc) Vacio = {FD}
-   case Vacio of
+   indentar k Vacio
+   = foldDoc Vacio (Texto str doc) (Linea (int + k) doc) Vacio    <- {ID}
+   = case Vacio of                                                <- {FD}
      Vacio -> Vacio
      Texto s d -> ...
      Linea i d -> ...
-   Resultado: Vacio
+   = Vacio                                                        <- {Caso "Vacio" del case of}
    -- Queda demostrado
 
 2. indentar k (Texto s d) = Texto s (indentar k d)
 
-   indentar k (Texto s d) = {ID}
-   foldDoc Vacio (Texto str doc) (Linea (int + k) doc) (Texto s d) = {FD}
-   case Texto s d of
+   indentar k (Texto s d)
+   = foldDoc Vacio (Texto str doc) (Linea (int + k) doc) (Texto s d)                          <- {ID}
+   = case Texto s d of                                                                        <- {FD}
+     Vacio -> Vacio
      Texto s d -> (Texto str doc) s (foldDoc Vacio (Texto str doc) (Linea (int + k) doc) d)
-   Resultado:
-   Texto s (foldDoc Vacio (Texto str doc) (Linea (int + k) doc) d) = {ID}
-   Texto s (indentar k d)
+     Linea k d -> Linea (int + m) (foldDoc Vacio (Texto str doc) (Linea (int + m) doc) d)
+   = Texto s (foldDoc Vacio (Texto str doc) (Linea (int + k) doc) d)                           <-{Caso "Texto s d" del case of}
+   = Texto s (indentar k d)                                                                    <-{ID} 
    -- Lado izquierdo implica lado derecho, demostrado
 
 3. indentar m (Linea k d) = Linea (m+k) (indentar m d)
 
-   indentar m (Linea k d) = {ID}
-   foldDoc Vacio (Texto str doc) (Linea (int + m) doc) (Linea k d) = {FD}
-   case Linea k d of
-     Linea k d -> (Linea (int + m) doc) k (foldDoc Vacio (Texto str doc) (Linea (int + m) doc) d)
-   Resultado:
-   Linea (k + m) (foldDoc Vacio (Texto str doc) (Linea (int + m) doc) d) = {ID}
-   Linea (m + k) (indentar m d)
+   indentar m (Linea k d)
+   = foldDoc Vacio (Texto str doc) (Linea (int + m) doc) (Linea k d)                          <- {ID}
+   = case Linea k d of                                                                        <- {FD}
+      Vacio -> Vacio
+      Texto s d -> Texto s (foldDoc Vacio (Texto str doc) (Linea (int + m) doc) d)
+      Linea k d -> Linea (int + m) (foldDoc Vacio (Texto str doc) (Linea (int + m) doc) d)
+   = Linea (k + m) (foldDoc Vacio (Texto str doc) (Linea (int + m) doc) d)                    <- {Caso "Linea k d" del case of}
+   = Linea (m + k) (indentar m d)                                                             <- {ID}
    -- Queda demostrado
