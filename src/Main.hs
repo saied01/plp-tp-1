@@ -24,7 +24,19 @@ testsEj2 =
   test
     [ vacio <+> vacio ~?= vacio,
       texto "a" <+> texto "b" ~?= texto "ab",
-      (texto "a" <+> linea) <+> texto "b" ~?= texto "a" <+> (linea <+> texto "b")
+      (texto "a" <+> linea) <+> texto "b" ~?= texto "a" <+> (linea <+> texto "b"),
+
+      -- Concatenaciones con vacio
+      vacio <+> texto "hola" ~?= texto "hola",
+      texto "hola" <+> vacio ~?= texto "hola",
+
+      -- Otros casos
+      (texto "a" <+> texto "b") <+> texto "c" ~?= texto "abc",
+      texto "a" <+> (texto "b" <+> texto "c") ~?= texto "abc",
+      (linea <+> vacio) ~?= linea,
+      (vacio <+> linea) ~?= linea,
+      (texto "X" <+> vacio <+> texto "Y") ~?= texto "XY",
+      (vacio <+> linea <+> vacio <+> texto "fin") ~?= linea <+> texto "fin"
     ]
 
 testsEj3 :: Test
@@ -33,7 +45,8 @@ testsEj3 =
     [ indentar 2 vacio ~?= vacio,
       indentar 2 (texto "a") ~?= texto "a",
       indentar 2 (texto "a" <+> linea <+> texto "b") ~?= texto "a" <+> indentar 2 (linea <+> texto "b"),
-      indentar 2 (linea <+> texto "a") ~?= indentar 1 (indentar 1 (linea <+> texto "a"))
+      indentar 2 (linea <+> texto "a") ~?= indentar 1 (indentar 1 (linea <+> texto "a")),
+      indentar 3 (texto "hello") ~?= texto "hello"
     ]
 
 testsEj4 :: Test
@@ -41,7 +54,13 @@ testsEj4 =
   test
     [ mostrar vacio ~?= "",
       mostrar linea ~?= "\n",
-      mostrar (indentar 2 (texto "a" <+> linea <+> texto "b")) ~?= "a\n  b"
+      mostrar (indentar 2 (texto "a" <+> linea <+> texto "b")) ~?= "a\n  b",
+      mostrar (texto "a" <+> linea <+> texto "b") ~?= "a\nb",
+      mostrar (texto "abc") ~?= "abc",
+      mostrar (texto "a" <+> texto "b") ~?= "ab",
+      mostrar (indentar 2 (texto "abc" <+> linea <+> texto "def")) ~?= "abc\n  def",
+      mostrar (indentar 2 (texto "a" <+> linea <+> texto "b" <+> linea <+> texto "c"))
+        ~?= "a\n  b\n  c"
     ]
 
 pericles, merlina, addams, familias :: PPON
@@ -54,7 +73,14 @@ testsEj6 :: Test
 testsEj6 =
   test
     [ pponObjetoSimple pericles ~?= True,
-      pponObjetoSimple addams ~?= False
+      pponObjetoSimple addams ~?= False,
+      pponObjetoSimple addams ~?= False,
+      
+      pponObjetoSimple (ObjetoPP []) ~?= False,
+
+      pponObjetoSimple (ObjetoPP [("nombre", TextoPP "Cosa"), ("otro", pericles)]) ~?= True,
+      pponObjetoSimple (ObjetoPP [("nombre", TextoPP "Cosa"), ("sub", addams)]) ~?= True,
+      pponObjetoSimple (ObjetoPP [("sub", addams), ("nombre", TextoPP "Cosa")]) ~?= True
     ]
 
 a, b, c :: Doc
