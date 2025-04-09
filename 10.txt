@@ -68,8 +68,8 @@ indentar n (indentar m (Linea k d))
 = Linea (k + m + n) (indentar (n + m) d)         <- {HI}
 
 -- Lado derecho
-indentar (n + m) (Linea k d) = {Lema 3}
-Linea (k + n + m) (indentar (n + m) d)
+indentar (n + m) (Linea k d)
+= Linea (k + n + m) (indentar (n + m) d)        <- {Lema 3}
 
 Ambos lados son iguales porque (k + m + n) = (k + n + m) por la conmutatividad de la suma.
 
