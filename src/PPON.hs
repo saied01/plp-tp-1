@@ -40,10 +40,10 @@ entreLlaves ds =
     <+> texto "}"
 
 aplanar :: Doc -> Doc
-aplanar doc = intercalar (texto " ") (foldDoc [] textoRec lineaRec doc)
+aplanar doc = intercalar (texto "") (foldDoc [] textoRec lineaRec doc)
   where
-    textoRec str listaDoc = texto str :listaDoc
-    lineaRec _ listaDoc   = listaDoc
+    textoRec str listaDoc = texto str : listaDoc
+    lineaRec _ listaDoc   = texto " " : listaDoc
 
 pponADoc :: PPON -> Doc
 pponADoc ppon = case ppon of
