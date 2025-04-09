@@ -1,0 +1,120 @@
+data Doc
+  = Vacio
+  | Texto String Doc
+  | Linea Int Doc
+  deriving (Eq, Show)
+
+Definiciones:
+
+indentar :: Int -> Doc -> Doc
+{ID} indentar i d = foldDoc Vacio textoIgual agregarInd d
+  where
+    agregarInd int doc = Linea (int + i) doc
+    textoIgual str doc = Texto str doc
+    
+foldDoc :: b -> (String -> b -> b) -> (Int -> b -> b) -> Doc -> b
+{FD} foldDoc fv ft fl doc = case doc of
+                Vacio -> fv
+                Texto s d -> ft s (rec d)
+                Linea i d -> fl i (rec d)
+  where rec = foldDoc fv ft fl
+
+Probar que para todo n, m ∈ ℕ⁺ y x :: Doc, se cumple:
+indentar n (indentar m x) = indentar (n + m) x
+
+Demostración:
+
+CASO BASE:
+
+-- Lado izquierdo 
+indentar n (indentar m Vacio) = {Lema 1}
+indentar n Vacio = {Lema 1}
+Vacio
+
+-- Lado derecho
+indentar (n + m) Vacio = {beta}
+Vacio
+
+PASO INDUCTIVO:
+HI: indentar n (indentar m d) = indentar (n + m) d
+
+CASO 1:
+Para todo s :: String y d :: Doc
+
+QVQ: indentar n (indentar m (Texto s d)) = indentar (n + m) (Texto s d)
+
+-- Lado izquierdo
+indentar n (indentar m (Texto s d)) = {Lema 2}
+indentar n (Texto s (indentar m d)) = {Lema 2}
+Texto s (indentar n (indentar m d))          -- definición de indentar
+Texto s (indentar (n + m) d)                 -- por HI
+
+-- Lado derecho
+indentar (n + m) (Texto s d) = {Lema 2}
+Texto s (indentar (n + m) d)
+
+Llegamos a que ambos lados son iguales.
+
+CASO 2:
+
+Para todo k :: Int positivo y d :: Doc
+
+QVQ: indentar n (indentar m (Linea k d)) = indentar (n + m) (Linea k d)
+
+-- Lado izquierdo 
+indentar n (indentar m (Linea k d)) = {Lema 3}
+indentar n (Linea (k + m) (indentar m d)) = {Lema 3} 
+Linea (k + m + n) (indentar n (indentar m d)) = {HI} 
+Linea (k + m + n) (indentar (n + m) d)
+
+-- Lado derecho
+indentar (n + m) (Linea k d) = {Lema 3}
+Linea (k + n + m) (indentar (n + m) d)
+
+Ambos lados son iguales porque (k + m + n) = (k + n + m) por la conmutatividad de la suma.
+
+Lemas:
+
+1. indentar k Vacio = Vacio
+   para todo k :: Int positivo.
+
+2. indentar k (Texto s d) = Texto s (indentar k d)
+   para todo k :: Int positivo, s :: String y d :: Doc.
+
+3. indentar m (Linea k d) = Linea (m+k) (indentar m d)
+   para todo m, k :: Int positivos y d :: Doc.
+
+Demostración de Lemas:
+
+1. indentar k Vacio = Vacio
+
+   indentar k Vacio = {ID}
+   foldDoc Vacio (Texto str doc) (Linea (int + k) doc) Vacio = {FD}
+   case Vacio of
+     Vacio -> Vacio
+     Texto s d -> ...
+     Linea i d -> ...
+   Resultado: Vacio
+   -- Queda demostrado
+
+2. indentar k (Texto s d) = Texto s (indentar k d)
+
+   indentar k (Texto s d) = {ID}
+   foldDoc Vacio (Texto str doc) (Linea (int + k) doc) (Texto s d) = {FD}
+   case Texto s d of
+     Texto s d -> (Texto str doc) s (foldDoc Vacio (Texto str doc) (Linea (int + k) doc) d)
+   Resultado:
+   Texto s (foldDoc Vacio (Texto str doc) (Linea (int + k) doc) d) = {ID}
+   Texto s (indentar k d)
+   -- Lado izquierdo implica lado derecho, demostrado
+
+3. indentar m (Linea k d) = Linea (m+k) (indentar m d)
+
+   indentar m (Linea k d) = {ID}
+   foldDoc Vacio (Texto str doc) (Linea (int + m) doc) (Linea k d) = {FD}
+   case Linea k d of
+     Linea k d -> (Linea (int + m) doc) k (foldDoc Vacio (Texto str doc) (Linea (int + m) doc) d)
+   Resultado:
+   Linea (k + m) (foldDoc Vacio (Texto str doc) (Linea (int + m) doc) d) = {ID}
+   Linea (m + k) (indentar m d)
+   -- Queda demostrado
