@@ -1,7 +1,6 @@
 module PPON where
 
 import Documento
-import GHC.IO.Encoding (TextEncoding(textEncodingName))
 
 data PPON
   = TextoPP String
@@ -10,22 +9,13 @@ data PPON
   deriving (Eq, Show)
 
 pponAtomico :: PPON -> Bool
-pponAtomico pp = case pp of
-  TextoPP x -> True
-  IntPP x -> True
-  _ -> False
+pponAtomico = error "PENDIENTE: Ejercicio 5"
 
 pponObjetoSimple :: PPON -> Bool
-pponObjetoSimple pp = case pp of
-  TextoPP _ -> False
-  IntPP _ -> False
-  ObjetoPP pp -> foldr pponAtomicoAux b pp
-  where b = False
-        pponAtomicoAux (_,x) b = pponAtomico x || b
+pponObjetoSimple = error "PENDIENTE: Ejercicio 6"
 
 intercalar :: Doc -> [Doc] -> Doc
-intercalar _ [] = texto ""
-intercalar separador listaDoc = foldl1 (\acc x -> acc <+> separador <+> x) listaDoc
+intercalar = error "PENDIENTE: Ejercicio 7"
 
 entreLlaves :: [Doc] -> Doc
 entreLlaves [] = texto "{ }"
@@ -40,17 +30,7 @@ entreLlaves ds =
     <+> texto "}"
 
 aplanar :: Doc -> Doc
-aplanar doc = intercalar (texto " ") (foldDoc [] textoRec lineaRec doc)
-  where
-    textoRec str listaDoc = texto str :listaDoc
-    lineaRec _ listaDoc   = listaDoc
+aplanar = error "PENDIENTE: Ejercicio 8"
 
 pponADoc :: PPON -> Doc
-pponADoc ppon = case ppon of
-  TextoPP s -> texto (['"'] ++ s ++ ['"'])
-  IntPP i -> texto (show i)
-  ObjetoPP o -> if pponObjetoSimple (ObjetoPP o) then entreLlavesSinSaltos (map formatoPPON o) else entreLlaves (map formatoPPON o)
-    where formatoPPON (s,pp) = texto (show s ++ ": ") <+> pponADoc pp
-
-entreLlavesSinSaltos :: [Doc] -> Doc
-entreLlavesSinSaltos ds = texto "{ " <+> intercalar (texto ", ") ds <+> texto " }"
+pponADoc = error "PENDIENTE: Ejercicio 9"

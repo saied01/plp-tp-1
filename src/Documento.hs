@@ -1,5 +1,3 @@
-{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
-{-# HLINT ignore "Eta reduce" #-}
 module Documento
   ( Doc,
     vacio,
@@ -49,14 +47,8 @@ d1 <+> d2 = foldDoc d2 textoRec lineaRec d1
     textoRec s x = case x of
       Texto s2 d  -> Texto (s ++ s2) d
       _           -> Texto s x
-    lineaRec i d = Linea i d
+    lineaRec = Linea
 
---Asumo que d1 y d2 son documentos validos, es decir, cumplen con el invariante.
---La unica forma en la que el resultado sea un documento que no es valido, es que d1 tenga como
---ultimo elemento un texto y d2 tenga como primer elemento un texto, por lo tanto el resultado
---tendria un texto seguido de un texto, lo cual no es valido. Para evitar eso, tengo el caso
---"Texto s2 d  -> Texto (s ++ s2) d" (Linea 50), que se encarga de concatenar los strings
---y dejar el resto del documento como estaba.
 
 indentar :: Int -> Doc -> Doc
 indentar i d = foldDoc Vacio textoIgual agregarInd d
