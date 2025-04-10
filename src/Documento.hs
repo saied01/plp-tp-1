@@ -31,7 +31,7 @@ texto t | '\n' `elem` t = error "El texto no debe contener saltos de línea"
 texto [] = Vacio
 texto t = Texto t Vacio
 
--- foldDoc :: ... PENDIENTE: Ejercicio 1 ...
+
 foldDoc :: b -> (String -> b -> b) -> (Int -> b -> b) -> Doc -> b
 foldDoc fv ft fl doc = case doc of
                         Vacio -> fv
@@ -63,6 +63,9 @@ indentar i d = foldDoc Vacio textoIgual agregarInd d
   where
     agregarInd int doc = Linea (int+i) doc 
     textoIgual str doc = Texto str doc
+
+-- El invariante de Doc dice que la cantidad de lineas luego de un salto debe ser mayor o igual a cero.
+-- Asumiendo que d es un documento valido, y asumiendo tambien que dado "indentar i d" con i >= 0, entonces se garantiza que se mantiene el invariante.
 
 mostrar :: Doc -> String
 mostrar = foldDoc ("") (\s dacc -> s ++ dacc) (\i dacc -> "\n" ++ (replicate i ' ') ++ dacc)
